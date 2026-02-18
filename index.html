@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Map of Ko-oren</title>
+
+  <!-- marker.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/markerjs@2/dist/markerjs.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    img {
+      max-width: 100%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Click the map to add markers</h2>
+
+<img id="mapImage" src="map.png" alt="Map">
+
+<script>
+  const image = document.getElementById("mapImage");
+
+  image.addEventListener("click", () => {
+    const markerArea = new markerjs2.MarkerArea(image);
+    markerArea.show();
+  });
+</script>
+
+</body>
+</html>
