@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Map Editor</title>
+  <script src="https://cdn.jsdelivr.net/npm/markerjs@2/dist/markerjs.min.js"></script>
+</head>
+<body>
+
+<h2>Map Editor (private)</h2>
+<p>Click the map to edit markers.</p>
+
+<img id="mapImage" src="map.png" style="max-width:100%;cursor:pointer;">
+<br><br>
+<button id="save">Save markers</button>
+
+<script>
+  const img = document.getElementById("mapImage");
+  let markerArea;
+
+  fetch("markers.json")
+    .then(res => res.json())
+    .then(state => {
+      markerArea = new markerjs2.MarkerArea(img);
+      markerArea.restoreState(state);
+      markerArea.render();
+    });
+
+  img.addEventListener("click", () => {
+    markerArea.show();
+  });
+
+  document.getElementById("save").addEventListener("click", () => {
+    const state = markerArea.getState();
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "markers.json";
+    a.click();
+  });
+</script>
+
+</body>
+</html>
