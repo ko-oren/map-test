@@ -16,46 +16,54 @@
 <button id="save">Save markers</button>
 
 <script>
-  const img = document.getElementById("mapImage");
-  let markerArea;
-  let markerState = null;
+// Use global markerjs3 object
+const { MarkerArea, ArrowMarker, MarkerView, Renderer } = markerjs3;
 
-  // Load saved markers (if present)
-  fetch("markers.json")
-    .then(res => res.json())
-    .then(state => {
-      markerState = state;
-    })
-    .catch(() => {
-      markerState = null;
-    });
+// create the target image element
+const targetImg = document.createElement('img');
+targetImg.src = 'map.png';
 
-  // Enter edit mode
-  document.getElementById("edit").addEventListener("click", () => {
-    markerArea = new markerjs2.MarkerArea(img);
+// app div
+const app = document.querySelector('#app');
 
-    if (markerState) {
-      markerArea.restoreState(markerState);
-    }
+// create the marker area, assign the target image and append it to the app div
+const markerArea = new MarkerArea();
+markerArea.targetImage = targetImg;
+app.appendChild(markerArea);
 
-    markerArea.show();
+// add arrow marker button action
+document.querySelector('#addArrowButton').addEventListener('click', () => {
+  markerArea.createMarker(ArrowMarker);
+});
+
+// add annotation viewer and hide it initially
+const markerView = new MarkerView();
+markerView.targetImage = targetImg;
+app.appendChild(markerView);
+markerView.style.display = 'none';
+
+// add save button action
+document.querySelector('#saveButton').addEventListener('click', () => {
+  // get marker area state (annotation)
+  const state = markerArea.getState();
+
+  // display the state in the viewer
+  markerView.style.display = '';
+  markerView.show(state);
+
+  // render the annotation to an image
+  const renderer = new Renderer();
+  renderer.targetImage = targetImg;
+  renderer.rasterize(state).then((dataUrl) => {
+    rasterImage.src = dataUrl;
+    rasterImage.style.display = '';
   });
+});
 
-  // Save marker state
-  document.getElementById("save").addEventListener("click", () => {
-    if (!markerArea) return;
-
-    const state = markerArea.getState();
-    const blob = new Blob(
-      [JSON.stringify(state, null, 2)],
-      { type: "application/json" }
-    );
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "markers.json";
-    a.click();
-  });
+// image element for the rendered annotation
+const rasterImage = document.createElement('img');
+app.appendChild(rasterImage);
+rasterImage.style.display = 'none';
 </script>
 
 </body>
