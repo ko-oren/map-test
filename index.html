@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Map Editor</title>
-  <script src="https://cdn.jsdelivr.net/npm/markerjs@2/dist/markerjs.min.js"></script>
-</head>
-<body>
-
-<h2>Map Editor (private)</h2>
-<p>Click “Edit markers” to modify the map.</p>
-
-<img id="mapImage" src="map.png" style="max-width:100%;">
-<br><br>
-<button id="edit">Edit markers</button>
-<button id="save">Save markers</button>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@markerjs/markerjs3/umd/markerjs3.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+    <title>marker.js 3 JavaScript Quick Start</title>
+  </head>
+  <body>
+    <div id="app">
+      <button id="addArrowButton">Add Arrow</button>
+      <button id="saveButton">Save</button>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
 
 <script>
 // Use global markerjs3 object
