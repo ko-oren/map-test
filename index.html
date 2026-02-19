@@ -1,26 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Map of Ko-oren</title>
-  <script src="https://cdn.jsdelivr.net/npm/markerjs@2/dist/markerjs.min.js"></script>
-</head>
-<body>
+// Use global markerjs3 object
+const { MarkerArea, ArrowMarker, MarkerView, Renderer } = markerjs3;
 
-<h2>Fictional Map</h2>
-<img id="mapImage" src="map.png" style="max-width:100%;">
+// create the target image element
+const targetImg = document.createElement('img');
+targetImg.src = './img/sample-image.png';
 
-<script>
-  const img = document.getElementById("mapImage");
+// app div
+const app = document.querySelector('#app');
 
-  fetch("markers.json")
-    .then(res => res.json())
-    .then(state => {
-      const markerArea = new markerjs2.MarkerArea(img);
-      markerArea.restoreState(state);
-      markerArea.render();
-    });
-</script>
+// create the marker area, assign the target image and append it to the app div
+const markerArea = new MarkerArea();
+markerArea.targetImage = targetImg;
+app.appendChild(markerArea);
 
-</body>
-</html>
+// add arrow marker button action
+document.querySelector('#addArrowButton').addEventListener('click', () => {
+  markerArea.createMarker(ArrowMarker);
+});
+
+// add annotation viewer and hide it initially
+const markerView = new MarkerView();
+markerView.targetImage = targetImg;
+app.appendChild(markerView);
+markerView.style.display = 'none';
+
+// add save button action
+document.querySelector('#saveButton').addEventListener('click', () => {
+  // get marker area state (annotation)
+  const state = markerArea.getState();
+
+  // display the state in the viewer
+  markerView.style.display = '';
+  markerView.show(state);
+
+  // render the annotation to an image
+  const renderer = new Renderer();
+  renderer.targetImage = targetImg;
+  renderer.rasterize(state).then((dataUrl) => {
+    rasterImage.src = dataUrl;
+    rasterImage.style.display = '';
+  });
+});
+
+// image element for the rendered annotation
+const rasterImage = document.createElement('img');
+app.appendChild(rasterImage);
+rasterImage.style.display = 'none';
