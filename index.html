@@ -1,48 +1,62 @@
-// Use global markerjs3 object
-const { MarkerArea, ArrowMarker, MarkerView, Renderer } = markerjs3;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Map Editor</title>
+  <script src="https://cdn.jsdelivr.net/npm/markerjs@2/dist/markerjs.min.js"></script>
+</head>
+<body>
 
-// create the target image element
-const targetImg = document.createElement('img');
-targetImg.src = 'map.png';
+<h2>Map Editor (private)</h2>
+<p>Click “Edit markers” to modify the map.</p>
 
-// app div
-const app = document.querySelector('#app');
+<img id="mapImage" src="map.png" style="max-width:100%;">
+<br><br>
+<button id="edit">Edit markers</button>
+<button id="save">Save markers</button>
 
-// create the marker area, assign the target image and append it to the app div
-const markerArea = new MarkerArea();
-markerArea.targetImage = targetImg;
-app.appendChild(markerArea);
+<script>
+  const img = document.getElementById("mapImage");
+  let markerArea;
+  let markerState = null;
 
-// add arrow marker button action
-document.querySelector('#addArrowButton').addEventListener('click', () => {
-  markerArea.createMarker(ArrowMarker);
-});
+  // Load saved markers (if present)
+  fetch("markers.json")
+    .then(res => res.json())
+    .then(state => {
+      markerState = state;
+    })
+    .catch(() => {
+      markerState = null;
+    });
 
-// add annotation viewer and hide it initially
-const markerView = new MarkerView();
-markerView.targetImage = targetImg;
-app.appendChild(markerView);
-markerView.style.display = 'none';
+  // Enter edit mode
+  document.getElementById("edit").addEventListener("click", () => {
+    markerArea = new markerjs2.MarkerArea(img);
 
-// add save button action
-document.querySelector('#saveButton').addEventListener('click', () => {
-  // get marker area state (annotation)
-  const state = markerArea.getState();
+    if (markerState) {
+      markerArea.restoreState(markerState);
+    }
 
-  // display the state in the viewer
-  markerView.style.display = '';
-  markerView.show(state);
-
-  // render the annotation to an image
-  const renderer = new Renderer();
-  renderer.targetImage = targetImg;
-  renderer.rasterize(state).then((dataUrl) => {
-    rasterImage.src = dataUrl;
-    rasterImage.style.display = '';
+    markerArea.show();
   });
-});
 
-// image element for the rendered annotation
-const rasterImage = document.createElement('img');
-app.appendChild(rasterImage);
-rasterImage.style.display = 'none';
+  // Save marker state
+  document.getElementById("save").addEventListener("click", () => {
+    if (!markerArea) return;
+
+    const state = markerArea.getState();
+    const blob = new Blob(
+      [JSON.stringify(state, null, 2)],
+      { type: "application/json" }
+    );
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "markers.json";
+    a.click();
+  });
+</script>
+
+</body>
+</html>
